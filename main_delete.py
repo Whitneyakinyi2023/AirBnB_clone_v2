@@ -8,9 +8,9 @@ fs = FileStorage()
 
 # All States
 all_states = fs.all(State)
-print("All States: {}".format(len(all_states)))
-for state_key in all_states:
-    print(state)
+print("All States: {}".format(len(all_states.keys())))
+for state_key in all_states.keys():
+    print(all_states[state_key])
 
 # Create a new State
 new_state = State()
