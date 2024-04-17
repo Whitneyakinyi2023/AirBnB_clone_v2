@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """ Console Module """
 import cmd
+import json
 import sys
 from models.base_model import BaseModel
 from models.__init__ import storage
@@ -73,7 +74,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}'\
+                    if pline[0] == '{' and pline[-1] == '}'\
                             and type(eval(pline)) is dict:
                         _args = pline
                     else:
@@ -119,28 +120,22 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
             return
         """Retrieval of class name"""
-        class_name = args.split()[0]
+        class_name, *parameters  = args.split()
         """Does the class exist?"""
         if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
 
         """Creation of new instance for the class"""
-        new_instance = HBNBCommand.classes[args]()
+        class_instance = HBNBCommand.classes[class_name]()
         
-        """Parsing"""
-        params = self.parse_params(args[len(class_name) + 1:])
-
-        """Attributes to newly created instances"""
-        for key, value in params.items():
-            if key not in dir(new_instance):
-                print(f"** no attribute {key} in {class_name} class **")
-                continue
-            setattr(new_instance, key, value)
+        for param in parameters:
+            key, value = param.split('=')
+            setattr(class_instance, key, value)
 
         """Handles saving of the new instance"""
-        storage.save()
-        print(new_instance.id)
+        class_instance.save()
+        print(class_instance.id)
 
     def parse_params(self, params_str):
         """Parses parameters in the input to the format "<key name>=<value>"""
@@ -243,19 +238,20 @@ class HBNBCommand(cmd.Cmd):
         """ Shows all objects, or all objects of a class"""
         print_list = []
 
-        if args:
-            args = args.split(' ')[0]  # remove possible trailing args
-            if args not in HBNBCommand.classes:
+        if not args:
+            for obj in storage.all().values():
+                print_list.append("[{}] ({}) {}".format(obj.__class__.__name__, obj.id, obj.to_dict()))
+        else:
+            class_name = args.split()[0]
+            if class_name not in HBNBCommand.classes:
                 print("** class doesn't exist **")
                 return
-            for k, v in storage._FileStorage__objects.items():
-                if k.split('.')[0] == args:
-                    print_list.append(str(v))
-        else:
-            for k, v in storage._FileStorage__objects.items():
-                print_list.append(str(v))
+            for key, obj in storage.all().items():
+                if key.split('.')[0] == class_name:
+                    print_list.append("[{}] ({}) {}".format(obj.__class__.__name__, obj.id, obj.to_dict()))
 
-        print(print_list)
+        for item in print_list:
+            print(item)
 
     def help_all(self):
         """ Help information for the all command """
@@ -314,7 +310,7 @@ class HBNBCommand(cmd.Cmd):
                 args.append(v)
         else:  # isolate args
             args = args[2]
-            if args and args[0] is '\"':  # check for quoted arg
+            if args and args[0] == '\"':  # check for quoted arg
                 second_quote = args.find('\"', 1)
                 att_name = args[1:second_quote]
                 args = args[second_quote + 1:]
@@ -322,10 +318,10 @@ class HBNBCommand(cmd.Cmd):
             args = args.partition(' ')
 
             # if att_name was not quoted arg
-            if not att_name and args[0] is not ' ':
+            if not att_name and args[0] != ' ':
                 att_name = args[0]
             # check for quoted val arg
-            if args[2] and args[2][0] is '\"':
+            if args[2] and args[2][0] == '\"':
                 att_val = args[2][1:args[2].find('\"', 1)]
 
             # if att_val was not quoted arg
