@@ -1,14 +1,15 @@
 #!/usr/bin/python3
 """ Place Module for HBNB project """
-import models
 from os import getenv
 import sqlalchemy
-from sqlalchemy import Column, String, Integer, Float, ForeignKey, Table
-from sqlalchemy.orm import relationship
-from models.base_model import BaseModel
+from models.user import User
+from models.review import Review
 
 if models.storage_t == 'db':
     """Define Many-to-Many relationship table for Place and Amenity"""
+    from sqlalchemy import Table, Column, String, ForeignKey
+    from sqlalchemy.orm import relationship
+    from models.base_model import Base
     place_amenity = Table('place_amenity', Base.metadata,
                           Column('place_id', String(60),
                                  ForeignKey('places.id', onupdate='CASCADE',

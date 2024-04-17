@@ -3,8 +3,10 @@
 import uuid
 from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
+from typing import ForwardRef
 
-
+Place = ForwardRef("Place")
+User = ForwardRef("User")
 Base = declarative_base()
 class BaseModel:
     """A base class for all hbnb models"""

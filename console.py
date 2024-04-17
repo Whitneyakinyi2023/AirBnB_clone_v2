@@ -236,6 +236,8 @@ class HBNBCommand(cmd.Cmd):
 
     def do_all(self, args):
         """ Shows all objects, or all objects of a class"""
+        from models.place import Place
+        from models.user import User
         print_list = []
 
         if not args:
