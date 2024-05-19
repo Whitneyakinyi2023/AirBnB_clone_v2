@@ -25,10 +25,11 @@ def c_text(text):
     return 'C ' + text.replace('_', ' ')
 
 
+@app.route('/python', strict_slashes=False)
 @app.route('/python/<text>', strict_slashes=False)
 def python_text(text):
     """Returns python text"""
-    return 'Python ' + text.replace('_', ' ')
+    return 'Python s' + text.replace('_', ' ')
 
 
 if __name__ == '__main__':
