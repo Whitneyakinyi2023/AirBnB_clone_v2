@@ -1,0 +1,14 @@
+#!/usr/bin/python3
+from flask import Flask
+
+app = Flask(__name__)
+
+"""
+A welcoming message for your Flask application!
+"""
+@app.route('/', strict_slashes=False)
+def hello_world():
+    return "Hello HBNB!"
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
